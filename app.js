@@ -12,7 +12,7 @@ const estudiantes = [
 const estudianteX = {
   id: 7,
   nombre: "Lucia Gomez",
-  nota: 95,
+  nota: 95, 
 };
 
 // Referencias al DOM
@@ -123,3 +123,5 @@ btnAgregar.addEventListener("click", () => {
 
 // Llamada inicial
 renderizarLista(estudiantes);
+
+//Fin
