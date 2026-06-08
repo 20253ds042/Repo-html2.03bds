@@ -1,76 +1,125 @@
 // Declaraciones de variables
 const estudiantes = [
-  { id: 1, nombre: "Ana Lopez",    nota: 90 },
-  { id: 2, nombre: "Carlos Ruiz",  nota: 55 },
+  { id: 1, nombre: "Ana Lopez", nota: 90 },
+  { id: 2, nombre: "Carlos Ruiz", nota: 55 },
   { id: 3, nombre: "Maria Torres", nota: 78 },
-  { id: 4, nombre: "Luis Mendez",  nota: 45 },
-  { id: 5, nombre: "Sofia Rios",   nota: 88 },
-  { id: 6, nombre: "Pedro Soto",   nota: 62 },
+  { id: 4, nombre: "Luis Mendez", nota: 45 },
+  { id: 5, nombre: "Sofia Rios", nota: 88 },
+  { id: 6, nombre: "Pedro Soto", nota: 62 },
 ];
 
-//Un estudiante solito
+// Un estudiante solito
 const estudianteX = {
-    id: 7, nombre: "Lucia Gomez", nota: 95
+  id: 7,
+  nombre: "Lucia Gomez",
+  nota: 95,
 };
 
-//Referencias al DOM
+// Referencias al DOM
 const seccionEstudiantes = document.getElementById("lista-estudiantes");
+const seccionPromedio = document.getElementById("resultado-promedio");
+
 const btnTodos = document.getElementById("btn-todos");
 const btnAprobados = document.getElementById("btn-aprobados");
 const btnReprobados = document.getElementById("btn-reprobados");
 const btnPromedio = document.getElementById("btn-promedio");
 
-//Funciones
+const inputNombre = document.getElementById("input-nombre");
+const inputNota = document.getElementById("input-nota");
+const btnAgregar = document.getElementById("btn-agregar");
 
+// Funciones
 const crearTarjeta = (unEstudiante) => {
-    const estado = unEstudiante.nota > 60 ? "Aprobado" : "Reprobado";
-    const clase = unEstudiante.nota > 60 ? "aprobado" : "reprobado";
+  const estado = unEstudiante.nota > 60 ? "Aprobado" : "Reprobado";
+  const clase = unEstudiante.nota > 60 ? "aprobado" : "reprobado";
 
-    const tarjeta = `
+  return `
     <div class="tarjeta ${clase}">
-        <h2>${unEstudiante.nombre}</h2>
-        <p>Nota: ${unEstudiante.nota}</p>
-        <p>${estado}</p>
+      <h2>${unEstudiante.nombre}</h2>
+      <p>Nota: ${unEstudiante.nota}</p>
+      <p>${estado}</p>
     </div>
-    `;
-    return tarjeta;
+  `;
 };
 
+const renderizarLista = (estudiantesAPintar) => {
+  const listaTarjetas = estudiantesAPintar.map((estudiante) =>
+    crearTarjeta(estudiante)
+  );
 
-const renderizarLista = (estudiantesApintar) => {
-    const listaTarjeta = estudiantesApintar.map(
-        (unEstudiante) => {
-            const tarjeta = crearTarjeta(unEstudiante);
-            return tarjeta;
-        }
-    );
-    seccionEstudiantes.innerHTML = (listaTarjeta.join(""));
+  seccionEstudiantes.innerHTML = listaTarjetas.join("");
 };
 
-//Eventos
+const toFixedTrunc = (num, decimales) => {
+  const factor = Math.pow(10, decimales);
+  const truncado = Math.trunc(num * factor) / factor;
+  return truncado.toFixed(decimales);
+};
 
-btnTodos.addEventListener('click', () => {
-    renderizarLista(estudiantes);
-});
-    
-btnAprobados.addEventListener('click', () => {
-    const aprobados = estudiantes.filter(
-        (unEstudianteX)=> {
-            return unEstudianteX.nota > 60;
-        }
-    );
-    renderizarLista(aprobados);
+// Eventos
+
+// Mostrar todos
+btnTodos.addEventListener("click", () => {
+  renderizarLista(estudiantes);
 });
 
-btnReprobados.addEventListener('click', () => {
-    const reprobados = estudiantes.filter(
-        (unEstudianteX)=> {
-            return unEstudianteX.nota < 61;
-        }
-    );
-    renderizarLista(reprobados);
+// Mostrar aprobados
+btnAprobados.addEventListener("click", () => {
+  const aprobados = estudiantes.filter((estudiante) => {
+    return estudiante.nota > 60;
+  });
+
+  renderizarLista(aprobados);
 });
 
-//LLamadas a funciones
+// Mostrar reprobados
+btnReprobados.addEventListener("click", () => {
+  const reprobados = estudiantes.filter((estudiante) => {
+    return estudiante.nota <= 60;
+  });
 
+  renderizarLista(reprobados);
+});
+
+// Mostrar promedio
+btnPromedio.addEventListener("click", () => {
+  const sumaNotas = estudiantes.reduce((acumulador, estudiante) => {
+    return acumulador + estudiante.nota;
+  }, 0);
+
+  const promedio = sumaNotas / estudiantes.length;
+
+  seccionPromedio.innerHTML = `Promedio: ${toFixedTrunc(promedio, 2)}`;
+  seccionPromedio.style.display = "block";
+});
+
+// Agregar estudiante
+btnAgregar.addEventListener("click", () => {
+  const nombre = inputNombre.value.trim();
+  const nota = parseInt(inputNota.value);
+
+  if (nombre === "" || isNaN(nota) || nota < 0 || nota > 100) {
+    alert("Por favor ingresa un nombre y una nota entre 0 y 100");
+    return;
+  }
+
+  const nuevoEstudiante = {
+    id: estudiantes.length + 1,
+    nombre,
+    nota,
+  };
+
+  estudiantes.push(nuevoEstudiante);
+
+  renderizarLista(estudiantes);
+
+  // Limpiar inputs
+  inputNombre.value = "";
+  inputNota.value = "";
+
+  // Ocultar promedio si estaba visible
+  seccionPromedio.style.display = "none";
+});
+
+// Llamada inicial
 renderizarLista(estudiantes);
